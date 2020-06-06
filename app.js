@@ -11,22 +11,10 @@ class Book {
 
 //Handling UI tasks
 class UI {
-  // static displayBooks() {
-  //   const StoredBooks = [
-  //     {
-  //       title: 'Book 1',
-  //       author: 'author 1',
-  //       isbn: '1111'
-  //     },
-  //     {
-  //       title: 'Book 2',
-  //       author: 'author 2',
-  //       isbn: '2222'
-  //     }
-  //   ];
-  //   const books = StoredBooks;
-  //   books.forEach((book) => UI.addBookToList(book));
-  // }
+  static displayBooks() {
+    const books = Store.getBooks();
+    books.forEach((book) => UI.addBookToList(book));
+  }
   static addBookToList(book) {
     const list = document.querySelector('#book-list');
     const row = document.createElement('tr');
@@ -51,7 +39,7 @@ class UI {
     }
   }
 
-  //Bootstrap validation methos built in JS
+  //Bootstrap validation method built in JS
   static showAlert(message, className) {
     const div = document.createElement('div');
     div.className = `alert alert-${className}`;
@@ -60,7 +48,34 @@ class UI {
     const form = document.querySelector('#book-form');
     container.insertBefore(div, form);
     //Make dissapear in x seconds
-    setTimeout(() => document.querySelector('.alert').remove(), 2000);
+    setTimeout(() => document.querySelector('.alert').remove(), 1500);
+  }
+}
+
+//Local Storage
+class Store {
+  static getBooks() {
+    let books;
+    if (localStorage.getItem('books') === null) {
+      books = [];
+    } else {
+      books = JSON.parse(localStorage.getItem('books'));
+    }
+    return books;
+  }
+  static addBook(book) {
+    const books = Store.getBooks();
+    books.push(book);
+    localStorage.setItem('books', JSON.stringify(books));
+  }
+  static removeBook(isbn) {
+    const books = Store.getBooks();
+    books.forEach((book, i) => {
+      if (book.isbn === isbn) {
+        books.splice(i, 1);
+      }
+    });
+    localStorage.setItem('books', JSON.stringify(books));
   }
 }
 
@@ -77,9 +92,11 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
     UI.showAlert("one filed is empty", "danger");
   } else {
     //Instatiate book
-    const booka = new Book(title, author, isbn);
+    const book = new Book(title, author, isbn);
     //Add book to UI
-    UI.addBookToList(booka);
+    UI.addBookToList(book);
+    //Add book to Storage
+    Store.addBook(book);
     //Show success message
     UI.showAlert('Book added!', 'success');
     //Clear fields
@@ -90,19 +107,8 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
 //Remove a book (event propagation: target the whole list and delete the grandparent)
 document.querySelector('#book-list').addEventListener('click', (e) =>{
   UI.deleteBook(e.target);
+  //Remove book from Storage
+  Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
   //Show deleted message
   UI.showAlert('Book deleted!', 'warning');
 });
-
-//Local Storage
-class Store {
-  static getBooks() {
-
-  }
-  static addBook(book) {
-
-  }
-  static removeBook(isbn) {
-
-  }
-}
