@@ -33,8 +33,8 @@ class UI {
     const isbn = document.querySelector('#isbn').value = "";
   }
 
-  static deleteBook(element ) {
-    if(element.classList.contains('delete')) {
+  static deleteBook(element) {
+    if (element.classList.contains('delete')) {
       element.parentElement.parentElement.remove();
     }
   }
@@ -73,6 +73,8 @@ class Store {
     books.forEach((book, i) => {
       if (book.isbn === isbn) {
         books.splice(i, 1);
+        //Show deleted message
+        UI.showAlert('Book deleted!', 'warning');
       }
     });
     localStorage.setItem('books', JSON.stringify(books));
@@ -89,7 +91,7 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
   const isbn = document.querySelector('#isbn').value;
   //Validate
   if (title === '' || author === '' || isbn === '') {
-    UI.showAlert("one filed is empty", "danger");
+    UI.showAlert("No field can be left empty!", "danger");
   } else {
     //Instatiate book
     const book = new Book(title, author, isbn);
@@ -105,10 +107,10 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
 });
 
 //Remove a book (event propagation: target the whole list and delete the grandparent)
-document.querySelector('#book-list').addEventListener('click', (e) =>{
-  UI.deleteBook(e.target);
-  //Remove book from Storage
-  Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
-  //Show deleted message
-  UI.showAlert('Book deleted!', 'warning');
+document.querySelector('#book-list').addEventListener('click', (e) => {
+  if (e.target.classList.contains('delete') && confirm("Are you sure you want to delete " + e.target.parentElement.parentElement.childNodes[1].innerText + "?")) {
+    UI.deleteBook(e.target);
+    //Remove book from Storage
+    Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
+  }
 });
