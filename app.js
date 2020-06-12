@@ -15,6 +15,7 @@ class UI {
     const books = Store.getBooks();
     books.forEach((book) => UI.addBookToList(book));
   }
+
   static addBookToList(book) {
     const list = document.querySelector('#book-list');
     const row = document.createElement('tr');
@@ -22,6 +23,7 @@ class UI {
       <td>${book.title}</td>
       <td>${book.author}</td>
       <td>${book.isbn}</td>
+      <td><a href="#" class="btn btn-info btn-sm edit">Edit</a></td>
       <td><a href="#" class="btn btn-warning btn-sm delete">X</a></td>
     `;
     list.appendChild(row);
@@ -87,6 +89,12 @@ class UI {
     }
   }
 
+  static editBook(book) {
+    document.getElementById('title').value = book.parentElement.parentElement.querySelectorAll('td')[0].innerHTML;
+    document.getElementById('author').value = book.parentElement.parentElement.querySelectorAll('td')[1].innerHTML;
+    document.getElementById('isbn').value = book.parentElement.parentElement.querySelectorAll('td')[2].innerHTML;
+  }
+
 }
 
 //Local Storage
@@ -111,7 +119,7 @@ class Store {
       if (book.isbn === isbn) {
         books.splice(i, 1);
         //Show deleted message
-        UI.showAlert('Book deleted!', 'warning');
+        // UI.showAlert('Book deleted!', 'warning');
       }
     });
     localStorage.setItem('books', JSON.stringify(books));
@@ -137,7 +145,7 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
     //Add book to Storage
     Store.addBook(book);
     //Show success message
-    UI.showAlert('Book added!', 'success');
+    UI.showAlert('Book added/updated!', 'success');
     //Clear fields
     UI.clearFields();
   }
@@ -148,7 +156,8 @@ document.querySelector('#book-list').addEventListener('click', (e) => {
   if (e.target.classList.contains('delete') && confirm("Are you sure you want to delete " + e.target.parentElement.parentElement.childNodes[1].innerText + "?")) {
     UI.deleteBook(e.target);
     //Remove book from Storage
-    Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
+    Store.removeBook(e.target.parentElement.previousElementSibling.previousElementSibling.textContent);
+    UI.showAlert('Book deleted!', 'warning');
   }
 });
 
@@ -159,3 +168,12 @@ for (let col = 0; col < tabHead.length - 1; col++) {
     UI.sortTable(col);
   });
 }
+
+// Editing a book
+document.querySelector('#book-list').addEventListener('click', (e) => {
+  if (e.target.classList.contains('edit')) {
+    UI.editBook(e.target);
+    e.target.parentElement.parentElement.remove();
+    Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
+  }
+});
