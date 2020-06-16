@@ -50,12 +50,18 @@ class UI {
     const form = document.querySelector('#book-form');
     container.insertBefore(div, form);
     //Make dissapear in x seconds
-    setTimeout(() => document.querySelector('.alert').remove(), 1500);
+    setTimeout(() => document.querySelector('.alert').remove(), 2000);
   }
 
   //Sorting function itself
   static sortTable(col) {
-    let table, rows, switching, i, x, y, shouldSwitch;
+    let table,
+      rows,
+      switching,
+      i,
+      x,
+      y,
+      shouldSwitch;
     table = document.getElementsByClassName("table")[0];
     switching = true;
     /*Make a loop that will continue until
@@ -118,8 +124,6 @@ class Store {
     books.forEach((book, i) => {
       if (book.isbn === isbn) {
         books.splice(i, 1);
-        //Show deleted message
-        // UI.showAlert('Book deleted!', 'warning');
       }
     });
     localStorage.setItem('books', JSON.stringify(books));
@@ -134,10 +138,20 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
   const title = document.querySelector('#title').value;
   const author = document.querySelector('#author').value;
   const isbn = document.querySelector('#isbn').value;
+  const bookList = document.getElementById('book-list');
   //Validate
+  let testArr = [];
+  for (let i = 0; i < bookList.rows.length; i++) {
+    testArr.push(bookList.rows[i].cells[2].innerHTML);
+  }
   if (title === '' || author === '' || isbn === '') {
     UI.showAlert("No field can be left empty!", "danger");
-  } else {
+  }
+  else if (testArr.includes(document.querySelector('#isbn').value)) {
+    UI.showAlert("ISBN already exists!", "danger");
+  }
+
+  else {
     //Instatiate book
     const book = new Book(title, author, isbn);
     //Add book to UI
