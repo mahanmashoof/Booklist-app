@@ -140,18 +140,15 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
   const isbn = document.querySelector('#isbn').value;
   const bookList = document.getElementById('book-list');
   //Validate
-  let testArr = [];
+  let isbnArr = [];
   for (let i = 0; i < bookList.rows.length; i++) {
-    testArr.push(bookList.rows[i].cells[2].innerHTML);
+    isbnArr.push(bookList.rows[i].cells[2].innerHTML);
   }
   if (title === '' || author === '' || isbn === '') {
-    UI.showAlert("No field can be left empty!", "danger");
-  }
-  else if (testArr.includes(document.querySelector('#isbn').value)) {
-    UI.showAlert("ISBN already exists!", "danger");
-  }
-
-  else {
+    UI.showAlert("Empty field(s)!", "danger");
+  } else if (isbnArr.includes(document.querySelector('#isbn').value)) {
+    UI.showAlert("This ISBN already exists!", "danger");
+  } else {
     //Instatiate book
     const book = new Book(title, author, isbn);
     //Add book to UI
